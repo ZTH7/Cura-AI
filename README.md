@@ -20,7 +20,7 @@
     - *Future plan*: guided breathing, meditation, and emotional journaling tools.
 
 - **NFT Badge System**
-    - Users earn **Soulbound NFT badges** by consistent check-ins (daily / cumulative).
+    - Users earn **Soulbound NFT badges** by consistent check-ins (daily / cumulative).Users participating in platform activities can receive **Daily NFT badges**, and the platform will regularly launch **Limited NFT badges** based on the theme of mental health.
     - *Future plan*: journaling, completing exercises.
     - Converts positive behavior into **verifiable digital assets**.
     - Unlike traditional in-app points, NFT badges are **user-owned and portable**, enabling cross-platform display and unlocking future community benefits (e.g., exclusive events, course access).
