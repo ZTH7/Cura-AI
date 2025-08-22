@@ -1,18 +1,16 @@
 "use client"; // ⚠️ 客户端组件
 import React, { useEffect, useMemo, useState } from "react";
 import { BrowserProvider, Contract } from "ethers";
-import { NFT_CONTRACT_ADDRESS, NFT_ABI } from "../config/nft";
-
-const ZERO_ADDR = "0x0000000000000000000000000000000000000000";
+import { CONTRACT_ADDRESS, ABI, NFT_ABI } from "../config/contract";
 
 const moods = [
   { day: "Mon.", mood: "😊" },
   { day: "Tue.", mood: "😐" },
   { day: "Wed.", mood: "😢" },
   { day: "Thur.", mood: "😄" },
-  { day: "Fri.", mood: "😎" },
-  { day: "Sat.", mood: "🥳" },
-  { day: "Sun.", mood: "😴" },
+  { day: "Fri.", mood: "❓" },
+  { day: "Sat.", mood: "❓" },
+  { day: "Sun.", mood: "❓" },
 ];
 
 function ipfsToHttp(url) {
@@ -30,19 +28,18 @@ export default function BadgeWall() {
   const [error, setError] = useState("");
   const [badges, setBadges] = useState([
   { id: 1, name: "First login", icon: "🏅", earned: true },
-  { id: 2, name: "Complete the assessment", icon: "🧠", earned: true },
-  { id: 3, name: "Maintain daily records for 7 days ", icon: "📅", earned: false },
-  { id: 4, name: "Check in daily for 30 days", icon: "🔥", earned: false },
+  { id: 2, name: "Assessment completed", icon: "🧠", earned: true },
+  { id: 3, name: "7 days checkin", icon: "📅", earned: false },
+  { id: 4, name: "30 days checkin", icon: "🔥", earned: false },
   { id: 5, name: "Share reflections", icon: "💬", earned: true },
   { id: 6, name: "Invite friends", icon: "🤝", earned: false }
 ]);
 
   const enabled = useMemo(
     () =>
-      NFT_CONTRACT_ADDRESS &&
-      NFT_CONTRACT_ADDRESS !== ZERO_ADDR &&
-      Array.isArray(NFT_ABI) &&
-      NFT_ABI.length > 0,
+      CONTRACT_ADDRESS &&
+      Array.isArray(ABI) &&
+      ABI.length > 0,
     []
   );
 
@@ -64,7 +61,7 @@ export default function BadgeWall() {
       setError("");
       try {
         if (typeof window === "undefined" || !window.ethereum) {
-          setError("未检测到钱包，无法读取 NFT。");
+          setError("Wallet not connected, please connect wallet first.");
           return;
         }
 
@@ -73,7 +70,7 @@ export default function BadgeWall() {
           await window.ethereum.request({ method: "eth_requestAccounts" });
         } catch {}
 
-        const contract = new Contract(NFT_CONTRACT_ADDRESS, NFT_ABI, provider);
+        const contract = new Contract(CONTRACT_ADDRESS, NFT_ABI, provider);
         const bal = await contract.balanceOf(account);
         const count = Number(bal);
         const items = [];
@@ -99,13 +96,13 @@ export default function BadgeWall() {
         if (!cancelled) setBadges(items);
       } catch (e) {
         console.error(e);
-        if (!cancelled) setError(e?.message || "读取 NFT 失败");
+        if (!cancelled) setError(e?.message || "Failed to load NFTs");
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
 
-    loadNFTs();
+    // loadNFTs();
     return () => {
       cancelled = true;
     };
@@ -114,7 +111,7 @@ export default function BadgeWall() {
   if (!account) {
     return (
       <div className="notice">
-        请先在首页连接钱包，之后回到此处查看你的勋章墙。
+        Please connect wallet first.
       </div>
     );
   }
@@ -131,7 +128,7 @@ export default function BadgeWall() {
         )}
         {!loading && badges.length === 0 && (
           <p className="small">
-            You haven't earned any badges yet. Complete activities or tasks to unlock exclusive badges.
+            You haven&apos;t earned any badges yet. Complete activities or tasks to unlock exclusive badges.
           </p>
         )}
 
@@ -152,12 +149,15 @@ export default function BadgeWall() {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: "1rem",
+                padding: "2rem",
                 borderRadius: "1rem",
                 background: "#fff",
                 boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
                 cursor: "pointer",
                 transition: "transform 0.2s",
+                width:"100px",
+                heigtht:"100px",
+                border:"2px solid #faaf98ff",
               }}
               onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
               onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
@@ -206,7 +206,7 @@ export default function BadgeWall() {
                 padding: "1rem",
                 borderRadius: "1rem",
                 boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-                width: "80px",
+                width: "70px",
               }}
             >
               <span style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>{item.mood}</span>

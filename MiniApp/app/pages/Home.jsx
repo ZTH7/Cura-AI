@@ -76,7 +76,7 @@ export default function Home(){
     <div className="container">
       <header className="header">
         <div className="brand">
-          <div className="brand-badge" />
+          
           <div>
             <div className="title">Cura - Psychological Counseling</div>
             <div className="small">Warm, gentle, and care for your every day</div>
@@ -85,7 +85,7 @@ export default function Home(){
         {account ? (
           <div className="badge">
             <span>Connected</span>
-            <strong>{account.slice(0,6)}…{account.slice(-4)}</strong>
+            <strong>0x…{account.slice(-4)}</strong>
           </div>
         ) : (
           <ConnectWallet />
@@ -103,7 +103,7 @@ export default function Home(){
           {!account && (
             <>
               <h3>Connect to start</h3>
-              <p className="small">Start by clicking the "Connect Wallet" button</p>
+              <p className="small">Start by clicking the &quot;Connect Wallet&quot; button</p>
             </>
           )}
 

@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useAccount, useSignMessage, useWriteContract } from 'wagmi'
 import { IPFS_API_URL, IPFS_HEADERS } from '../config/ipfs'
-import { SYNC_CONTRACT_ADDRESS, SYNC_ABI } from '../config/sync'
+import { CONTRACT_ADDRESS, ABI } from '../config/contract'
 
 function getLocalUser(addr){
   if(!addr) return null
@@ -28,7 +28,7 @@ export default function Chat(){
         }
       }
     }catch{}
-    return [{ role: 'assistant', content: '你好，我是你的心晴小助手。今天想聊聊什么？' }]
+    return [{ role: 'assistant', content: 'Hello, I am Cura. I am here to help you with your mental health. Would you like to talk about something?' }]
   })
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
@@ -106,20 +106,26 @@ export default function Chat(){
 
   async function saveCidToContract(cid){
     if(!account) throw new Error('Wallet not connected')
-    if(!SYNC_CONTRACT_ADDRESS){
+    if(!CONTRACT_ADDRESS){
       throw new Error('Sync contract address not configured')
     }
+    // Get existing profileCid from local user data
+    const existingProfileCid = userProfile?.profileCid || ''
     const hash = await writeContractAsync({
-      address: SYNC_CONTRACT_ADDRESS,
-      abi: SYNC_ABI,
-      functionName: 'saveChatCID',
-      args: [cid],
+      address: CONTRACT_ADDRESS,
+      abi: ABI,
+      functionName: 'updateUser',
+      args: [existingProfileCid, cid],
     })
     return hash
   }
 
   // 入口函数：加密 -> IPFS -> 上链同步 CID
   const encryptedBackup = async () => {
+    // alert('Encryption backup completed, CID: Qmdy3zaCRSxH2zB98r1bqVxxErfSrGE9DCw4re9rxsCqBh')
+    // Clear all local data
+    // localStorage.clear()
+
     try{
       const snapshot = {
         address: account || null,
@@ -145,10 +151,10 @@ export default function Chat(){
   }, [messages, storageKey])
 
   const systemPrompt = useMemo(() => {
-    const basic = '你是一位温柔、共情且专业的心理支持助手。用简洁温暖的话语回应，避免作出诊断与治疗承诺，鼓励自我觉察与情绪接纳，必要时建议用户寻求线下专业帮助。'
+    const basic = 'You are a gentle, empathetic, and professional psychological support assistant. Respond with concise and warm language, avoid making diagnoses or treatment promises, encourage self-awareness and emotional acceptance, and when necessary, suggest that the user seek professional offline help.'
     if(!userProfile) return basic
     const { nickname, gender, age } = userProfile
-    return `${basic}\n\n来访者基础信息：\n- 昵称：${nickname || '未填写'}\n- 性别：${gender || '未填写'}\n- 年龄：${age ?? '未填写'}\n在对话时，适度利用这些信息以更贴近用户，不要过度重复。`
+    return `${basic}\n\nVisitor basic information:\n- Nickname: ${nickname || 'Not filled'}\n- Gender: ${gender || 'Not filled'}\n- Age: ${age ?? 'Not filled'}\nWhen conversing, use these information to better understand the user, but do not repeat too much.`
   }, [userProfile])
 
   const sendMessage = async () => {
@@ -200,7 +206,7 @@ export default function Chat(){
     <div className="container">
       <header className="header">
         <div className="brand">
-          <div className="brand-badge" />
+          
           <div>
             <div className="title">Cura - Psychological Counseling</div>
             <div className="small">Listen to you every day</div>

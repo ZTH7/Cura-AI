@@ -26,7 +26,7 @@ export default function Profile() {
     <div className="container">
       <header className="header">
         <div className="brand">
-          <div className="brand-badge" />
+          
           <div>
             <div className="title">My Profile and Badges</div>
             <div className="small">Connect your story with every badge</div>
