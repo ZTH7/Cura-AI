@@ -24,7 +24,7 @@ export default function Profile(){
             <div className="small">连接你的故事与每一枚徽章</div>
           </div>
         </div>
-        <a className="button" href="#/">返回首页</a>
+        <button className="button" onClick={() => window.location.href = '/'}>返回首页</button>
       </header>
 
       <div className="row" style={{marginTop:16}}>

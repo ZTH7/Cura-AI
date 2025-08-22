@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { BrowserProvider } from 'ethers'
 import { useNavigate } from 'react-router-dom'
 import { getUserClient } from '../lib/userClient'
 import { CONTRACT_ADDRESS, ABI } from '../config/contract'
-import ConnectWallet from '../components/ConnectWallet'
+import { ConnectWallet } from '@coinbase/onchainkit/wallet'
 import OnboardingForm from '../components/OnboardingForm'
 import ProfileCard from '../components/ProfileCard'
 
@@ -26,27 +25,39 @@ export default function Home(){
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account])
 
-  const handleConnect = async () => {
-    setError('')
-    try{
-      if(!window.ethereum){
-        setError('未检测到 MetaMask（或兼容钱包）。请先安装后再试。')
-        return
+  // 监听 EIP-1193 provider 账户变化并初始化现有连接
+  useEffect(() => {
+    const eth = window.ethereum
+    if(!eth) return
+    // 不设置 provider，保持本地模式；当后续接入链上读写时再设置 ethers Signer/Provider
+
+    const setAddr = async (addr) => {
+      if(addr){
+        setAccount(addr)
+        localStorage.setItem('lastAccount', addr)
+        // 为本地模式提供 signer.getAddress() 的最小实现
+        setSigner({ getAddress: async () => addr })
+        await fetchUser(addr)
+      }else{
+        setAccount(null)
+        setSigner(null)
       }
-      const prov = new BrowserProvider(window.ethereum)
-      await window.ethereum.request({ method: 'eth_requestAccounts' })
-      const s = await prov.getSigner()
-      const addr = await s.getAddress()
-      setProvider(prov)
-      setSigner(s)
-      setAccount(addr)
-      localStorage.setItem('lastAccount', addr)
-      await fetchUser(addr)
-    }catch(e){
-      console.error(e)
-      setError(e?.shortMessage || e?.message || '连接钱包失败')
     }
-  }
+
+    // 初始已有授权账户
+    eth.request({ method: 'eth_accounts' })
+      .then((accs) => setAddr(accs && accs.length ? accs[0] : null))
+      .catch(() => {})
+
+    const onAccounts = (accs) => {
+      setAddr(accs && accs.length ? accs[0] : null)
+    }
+    eth.on?.('accountsChanged', onAccounts)
+    return () => {
+      eth.removeListener?.('accountsChanged', onAccounts)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const fetchUser = async (addr) => {
     setLoading(true)
@@ -85,7 +96,7 @@ export default function Home(){
         <div className="brand">
           <div className="brand-badge" />
           <div>
-            <div className="title">心晴 · 心理疏导 DApp</div>
+            <div className="title">Cura - Psychological Counseling</div>
             <div className="small">温暖、柔和、守护你的每一天</div>
           </div>
         </div>
@@ -95,7 +106,7 @@ export default function Home(){
             <strong>{account.slice(0,6)}…{account.slice(-4)}</strong>
           </div>
         ) : (
-          <ConnectWallet onConnect={handleConnect} />
+          <ConnectWallet />
         )}
       </header>
 

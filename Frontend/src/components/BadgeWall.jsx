@@ -105,26 +105,6 @@ export default function BadgeWall(){
 
 return (
 <div>
-  {/* 个人信息模块 */}
-  <div style={{ marginBottom: 24 }}>
-    <h3>我的信息</h3>
-    <div
-      style={{
-        display: 'flex',
-        gap: 16,
-        alignItems: 'center',
-        padding: '1rem',
-        background: '#f5f5f5',
-        borderRadius: '1rem',
-        boxShadow: '0 4px 10px rgba(0,0,0,0.05)',
-      }}
-    >
-      <div>用户名: 张三</div>
-      <div>积分: 120</div>
-      <div>等级: 初级</div>
-    </div>
-  </div>
-
   {/* 勋章墙模块 */}
   <div style={{ marginBottom: 24 }}>
     <h3>我的勋章墙</h3>
