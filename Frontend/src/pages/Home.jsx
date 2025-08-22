@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAccount } from 'wagmi'
 import { getUserClient } from '../lib/userClient'
 import { CONTRACT_ADDRESS, ABI } from '../config/contract'
 import { ConnectWallet } from '@coinbase/onchainkit/wallet'
@@ -7,13 +8,16 @@ import OnboardingForm from '../components/OnboardingForm'
 import ProfileCard from '../components/ProfileCard'
 
 export default function Home(){
-  const [account, setAccount] = useState(localStorage.getItem('lastAccount') || null)
+  const { address, isConnected } = useAccount()
   const [provider, setProvider] = useState(null)
   const [signer, setSigner] = useState(null)
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const navigate = useNavigate()
+  
+  // 使用 wagmi 的 address 作为 account
+  const account = address
 
   const userClient = useMemo(() => getUserClient({ provider, signer, contractAddress: CONTRACT_ADDRESS, abi: ABI }), [provider, signer])
 
@@ -25,39 +29,18 @@ export default function Home(){
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account])
 
-  // 监听 EIP-1193 provider 账户变化并初始化现有连接
+  // 当账户连接状态变化时，设置 signer 并获取用户数据
   useEffect(() => {
-    const eth = window.ethereum
-    if(!eth) return
-    // 不设置 provider，保持本地模式；当后续接入链上读写时再设置 ethers Signer/Provider
-
-    const setAddr = async (addr) => {
-      if(addr){
-        setAccount(addr)
-        localStorage.setItem('lastAccount', addr)
-        // 为本地模式提供 signer.getAddress() 的最小实现
-        setSigner({ getAddress: async () => addr })
-        await fetchUser(addr)
-      }else{
-        setAccount(null)
-        setSigner(null)
-      }
+    if(account && isConnected){
+      localStorage.setItem('lastAccount', account)
+      // 为本地模式提供 signer.getAddress() 的最小实现
+      setSigner({ getAddress: async () => account })
+      fetchUser(account)
+    } else {
+      setSigner(null)
+      setUser(null)
     }
-
-    // 初始已有授权账户
-    eth.request({ method: 'eth_accounts' })
-      .then((accs) => setAddr(accs && accs.length ? accs[0] : null))
-      .catch(() => {})
-
-    const onAccounts = (accs) => {
-      setAddr(accs && accs.length ? accs[0] : null)
-    }
-    eth.on?.('accountsChanged', onAccounts)
-    return () => {
-      eth.removeListener?.('accountsChanged', onAccounts)
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [account, isConnected])
 
   const fetchUser = async (addr) => {
     setLoading(true)
@@ -66,9 +49,6 @@ export default function Home(){
       const u = await userClient.getUser(addr)
       setUser(u)
     }catch(e){
-      if(process.env.NODE_ENV !== 'production'){
-        console.debug('getUser:', e?.message || e)
-      }
       setUser(null)
     }finally{
       setLoading(false)

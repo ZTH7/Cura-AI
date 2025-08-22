@@ -10,10 +10,13 @@
   },
   "dependencies": {
     "@coinbase/onchainkit": "latest",
+    "@tanstack/react-query": "^5.0.0",
     "ethers": "^6.13.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.2"
+    "react-router-dom": "^6.26.2",
+    "viem": "^2.0.0",
+    "wagmi": "^2.0.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.1",
