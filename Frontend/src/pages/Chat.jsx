@@ -105,7 +105,7 @@ export default function Chat(){
 
   async function saveCidToContract(cid){
     if(!account) throw new Error('Wallet not connected')
-    if(!SYNC_CONTRACT_ADDRESS || SYNC_CONTRACT_ADDRESS === '0x0000000000000000000000000000000000000000'){
+    if(!SYNC_CONTRACT_ADDRESS){
       throw new Error('Sync contract address not configured')
     }
     const hash = await writeContractAsync({

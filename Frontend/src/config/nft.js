@@ -1,5 +1,5 @@
 // 占位 NFT 合约配置：后续请替换为真实地址与 ABI（推荐 ERC-721 Enumerable）
-export const NFT_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000000'
+export const NFT_CONTRACT_ADDRESS = ''
 
 // 最小 ERC-721 Enumerable + tokenURI 读取 ABI（常见公开函数）
 export const NFT_ABI = [
