@@ -5,6 +5,7 @@ import { useAccount } from 'wagmi'
 import { getUserClient } from '../lib/userClient'
 import { CONTRACT_ADDRESS, ABI } from '../config/contract'
 import { ConnectWallet } from '@coinbase/onchainkit/wallet'
+import '@coinbase/onchainkit/styles.css'
 import OnboardingForm from '../components/OnboardingForm'
 import ProfileCard from '../components/ProfileCard'
 
