@@ -6,13 +6,13 @@ import { NFT_CONTRACT_ADDRESS, NFT_ABI } from "../config/nft";
 const ZERO_ADDR = "0x0000000000000000000000000000000000000000";
 
 const moods = [
-  { day: "周一", mood: "😊" },
-  { day: "周二", mood: "😐" },
-  { day: "周三", mood: "😢" },
-  { day: "周四", mood: "😄" },
-  { day: "周五", mood: "😎" },
-  { day: "周六", mood: "🥳" },
-  { day: "周日", mood: "😴" },
+  { day: "Mon.", mood: "😊" },
+  { day: "Tue.", mood: "😐" },
+  { day: "Wed.", mood: "😢" },
+  { day: "Thur.", mood: "😄" },
+  { day: "Fri.", mood: "😎" },
+  { day: "Sat.", mood: "🥳" },
+  { day: "Sun.", mood: "😴" },
 ];
 
 function ipfsToHttp(url) {
@@ -29,14 +29,12 @@ export default function BadgeWall() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [badges, setBadges] = useState([
-  { id: 1, name: "初次登录", icon: "🏅", earned: true },
-  { id: 2, name: "完成心理测试", icon: "🧠", earned: true },
-  { id: 3, name: "坚持记录 7 天", icon: "📅", earned: false },
-  { id: 4, name: "每日打卡 30 天", icon: "🔥", earned: false },
-  { id: 5, name: "分享心得", icon: "💬", earned: true },
-  { id: 6, name: "邀请朋友", icon: "🤝", earned: false },
-    { id: 7, name: "分享心得", icon: "💬", earned: true },
-  { id: 8, name: "邀请朋友", icon: "🤝", earned: false },
+  { id: 1, name: "First login", icon: "🏅", earned: true },
+  { id: 2, name: "Complete the assessment", icon: "🧠", earned: true },
+  { id: 3, name: "Maintain daily records for 7 days ", icon: "📅", earned: false },
+  { id: 4, name: "Check in daily for 30 days", icon: "🔥", earned: false },
+  { id: 5, name: "Share reflections", icon: "💬", earned: true },
+  { id: 6, name: "Invite friends", icon: "🤝", earned: false }
 ]);
 
   const enabled = useMemo(
@@ -188,7 +186,7 @@ export default function BadgeWall() {
       </div>
 
       <div>
-        <h3>我的心情表</h3>
+        <h3>My Mood Record</h3>
         <div
           style={{
             display: "flex",
