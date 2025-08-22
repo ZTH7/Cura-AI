@@ -75,12 +75,6 @@ contract PsyHelper is AccessControl {
     mapping(address => mapping(uint256 => bool)) public ruleMinted; //记录某用户是否已经领取过该规则的 NFT（防止重复发）。
 
 
-    //这里测试用
-    uint64 private _mockDay;
-    //这里测试用
-
-
-
     event Registered(address indexed user);
     event ProfileUpdated(address indexed user, string profileCid, string chatCid);
     event CheckedIn(address indexed user, uint32 streakDays, uint32 totalDays, uint64 dayIndex);
@@ -94,20 +88,11 @@ contract PsyHelper is AccessControl {
         badge = new SignBadgeNFT(msg.sender, address(this));
     }
 
-
-    //测试用
-    function setMockDay(uint64 d) external onlyRole(ADMIN) { _mockDay = d; }
-    //测试用
     
-    //把当前时间戳换算成“第几天”的整数索引（UTC 基准，简单好用）。
-    //注释掉的代码是原代码，现在的代码是用于天数测试
-    //function _todayIndex() internal view returns (uint64) {
-    //    return uint64(block.timestamp / 1 days);
-    //}
+
     function _todayIndex() internal view returns (uint64) {
-    if (_mockDay != 0) return _mockDay;
-    return uint64(block.timestamp / 1 days);
-}
+        return uint64(block.timestamp / 1 days);
+    }
 
 
 
@@ -214,3 +199,4 @@ contract PsyHelper is AccessControl {
         }
     }
 }
+
