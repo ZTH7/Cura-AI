@@ -64,7 +64,7 @@ export default function Home(){
       await fetchUser(addr)
     }catch(e){
       console.error(e)
-      setError(e?.shortMessage || e?.message || '创建用户失败')
+      setError(e?.shortMessage || e?.message || 'Failed to create user')
     }finally{
       setLoading(false)
     }
@@ -77,12 +77,12 @@ export default function Home(){
           <div className="brand-badge" />
           <div>
             <div className="title">Cura - Psychological Counseling</div>
-            <div className="small">温暖、柔和、守护你的每一天</div>
+            <div className="small">Warm, gentle, and care for your every day</div>
           </div>
         </div>
         {account ? (
           <div className="badge">
-            <span>已连接</span>
+            <span>Connected</span>
             <strong>{account.slice(0,6)}…{account.slice(-4)}</strong>
           </div>
         ) : (
@@ -91,8 +91,8 @@ export default function Home(){
       </header>
 
       <section className="hero">
-        <h1>与自己温柔相处，从此刻开始</h1>
-        <p>连接钱包后，我们会在合约中查找你的资料；若未找到，将引导你完成简单的信息创建。</p>
+        <h1>Be kind to yourself, start now</h1>
+        <p>Connect your wallet, we will look for your profile in the contract; if not found, we will guide you to create a simple profile.</p>
         {error && <div className="notice" style={{marginTop:12}}>{error}</div>}
       </section>
 
@@ -100,21 +100,21 @@ export default function Home(){
         <div className="card">
           {!account && (
             <>
-              <h3>一步连接 · 安心开启</h3>
-              <p className="small">点击右上角“连接钱包”按钮开始</p>
+              <h3>Connect to start</h3>
+              <p className="small">Start by clicking the "Connect Wallet" button</p>
             </>
           )}
 
           {account && loading && (
-            <p>正在加载你的资料…</p>
+            <p>Loading your profile…</p>
           )}
 
           {account && !loading && user && (
             <>
               <ProfileCard user={user} />
               <div style={{marginTop:16, display:'flex', gap:12, flexWrap:'wrap'}}>
-                <button className="button" onClick={()=>navigate('/chat')}>开始疏导</button>
-                <button className="button" onClick={()=>navigate('/profile')}>查看勋章墙</button>
+                <button className="button" style={{flex:'1', textAlign:'center'}} onClick={()=>navigate('/chat')}>Start Talking</button>
+                <button className="button" style={{flex:'1', textAlign:'center'}} onClick={()=>navigate('/profile')}>View Badges</button>
               </div>
             </>
           )}
@@ -125,13 +125,13 @@ export default function Home(){
         </div>
 
         <div className="card">
-          <h3>关于心晴</h3>
-          <p className="small">我们致力于用更温柔的方式帮助你觉察、理解和接纳自己。你的数据由你掌控，未来将通过智能合约安全管理。</p>
+          <h3>About Cura</h3>
+          <p className="small">We are committed to helping you become more aware of yourself, understand yourself, and accept yourself. Your data is under your control, and in the future, it will be managed through smart contracts.</p>
         </div>
       </div>
 
       <footer className="footer">
-        © {new Date().getFullYear()} 心晴 DApp · 用科技与温柔守护你
+        © {new Date().getFullYear()} Cura - Psychological Counseling · Using technology and kindness to protect you
       </footer>
     </div>
   )

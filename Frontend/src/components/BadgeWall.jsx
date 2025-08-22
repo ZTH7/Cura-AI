@@ -107,11 +107,11 @@ return (
 <div>
   {/* 勋章墙模块 */}
   <div style={{ marginBottom: 24 }}>
-    <h3>我的勋章墙</h3>
-    {loading && <p>正在读取你的 NFT 勋章…</p>}
+    <h3>My Badge Wall</h3>
+    {loading && <p>Reading your NFT badges…</p>}
     {error && <div className="notice" style={{ marginBottom: 12 }}>{error}</div>}
     {!loading && badges.length === 0 && (
-      <p className="small">尚未获得勋章。完成活动或任务即可解锁专属徽章。</p>
+      <p className="small">You haven't earned any badges yet. Complete activities or tasks to unlock exclusive badges.</p>
     )}
 
     <div

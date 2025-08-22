@@ -3,9 +3,6 @@ import { useAccount, useSignMessage, useWriteContract } from 'wagmi'
 import { IPFS_API_URL, IPFS_HEADERS } from '../config/ipfs'
 import { SYNC_CONTRACT_ADDRESS, SYNC_ABI } from '../config/sync'
 
-function getLastAccount(){
-  return localStorage.getItem('lastAccount') || ''
-}
 function getLocalUser(addr){
   if(!addr) return null
   const raw = localStorage.getItem(`user:${addr.toLowerCase()}`)
@@ -56,7 +53,7 @@ export default function Chat(){
 
   // ========== 加密与 IPFS 备份相关工具 ==========
   async function deriveAesKeyWithSigner(){
-    if(!account) throw new Error('未连接钱包')
+    if(!account) throw new Error('Wallet not connected')
     const addr = account.toLowerCase()
     const domainMsg = `Psych DApp chat backup v1\n${addr}`
     const sig = await signMessageAsync({ message: domainMsg })
@@ -95,21 +92,21 @@ export default function Chat(){
     })
     if(!res.ok){
       const t = await res.text()
-      throw new Error(`IPFS add 失败: ${res.status} ${t}`)
+      throw new Error(`Failed to add to IPFS: ${res.status} ${t}`)
     }
     const text = await res.text()
     // go-ipfs 返回 NDJSON，取最后一行解析 Hash
     const lines = text.trim().split(/\r?\n/)
     const last = JSON.parse(lines[lines.length-1])
     const cid = last.Hash || last.Cid || last.cid || ''
-    if(!cid) throw new Error('未获取到 CID')
+    if(!cid) throw new Error('Failed to get CID')
     return cid
   }
 
   async function saveCidToContract(cid){
-    if(!account) throw new Error('未连接钱包')
+    if(!account) throw new Error('Wallet not connected')
     if(!SYNC_CONTRACT_ADDRESS || SYNC_CONTRACT_ADDRESS === '0x0000000000000000000000000000000000000000'){
-      throw new Error('未配置同步合约地址')
+      throw new Error('Sync contract address not configured')
     }
     const hash = await writeContractAsync({
       address: SYNC_CONTRACT_ADDRESS,
@@ -132,10 +129,10 @@ export default function Chat(){
       const encObj = await encryptChatJson(snapshot)
       const cid = await ipfsAddJson(encObj)
       // await saveCidToContract(cid)
-      alert(`加密备份完成，CID: ${cid}`)
+      alert(`Encryption backup completed, CID: ${cid}`)
     }catch(e){
       console.error(e)
-      alert(`加密备份失败：${e?.message || e}`)
+      alert(`Encryption backup failed: ${e?.message || e}`)
     }
   }
 
@@ -155,7 +152,7 @@ export default function Chat(){
 
   const sendMessage = async () => {
     if(!apiKey) {
-      alert('请先输入 OpenAI API Key')
+      alert('Please enter OpenAI API Key')
       return
     }
     if(!input.trim()) return
@@ -185,14 +182,14 @@ export default function Chat(){
 
       if(!resp.ok){
         const errText = await resp.text()
-        throw new Error(errText || `OpenAI API 错误：${resp.status}`)
+        throw new Error(errText || `OpenAI API error: ${resp.status}`)
       }
       const data = await resp.json()
-      const ai = data?.choices?.[0]?.message?.content || '抱歉，我一时没有想好如何回应。'
+      const ai = data?.choices?.[0]?.message?.content || 'Pardon me, I don\'t know how to respond.'
       setMessages(prev => [...prev, { role: 'assistant', content: ai }])
     }catch(e){
       console.error(e)
-      setMessages(prev => [...prev, { role: 'assistant', content: '调用 OpenAI 失败，请检查 API Key 或稍后再试。' }])
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Failed to call OpenAI, please check API Key or try again later.' }])
     }finally{
       setSending(false)
     }
@@ -204,21 +201,21 @@ export default function Chat(){
         <div className="brand">
           <div className="brand-badge" />
           <div>
-            <div className="title">心晴 · 温暖聊天</div>
-            <div className="small">温柔陪伴，耐心倾听</div>
+            <div className="title">Cura - Psychological Counseling</div>
+            <div className="small">Listen to you every day</div>
           </div>
         </div>
         <div style={{display:'flex', gap:8}}>
-          <button className="button" onClick={encryptedBackup}>保存备份</button>
-          <button className="button" onClick={() => window.location.href = '/'}>返回首页</button>
+          <button className="button" onClick={encryptedBackup}>Backup</button>
+          <button className="button" onClick={() => window.location.href = '/'}>Home</button>
         </div>
       </header>
 
       <div className="row" style={{marginTop: 16}}>
         <div className="card" style={{flex: '1 1 600px'}}>
-          <h3>开始对话</h3>
+          <h3>Chat</h3>
           {!userProfile && (
-            <div className="notice" style={{marginBottom:12}}>未找到你的资料。返回首页完善资料，可以帮助我更好地陪伴你。</div>
+            <div className="notice" style={{marginBottom:12}}>Profile not found. Please go back to the home page to complete your profile, which will help me better accompany you.</div>
           )}
           <div style={{
             border:'1px solid #ffe5dc', borderRadius:12, padding:16, background:'#fff',
@@ -247,17 +244,16 @@ export default function Chat(){
             <div style={{flex:'1 1 auto'}}>
               <input
                 className="input"
-                placeholder="想聊些什么？"
+                placeholder="Type your message here"
                 value={input}
                 onChange={e=>setInput(e.target.value)}
                 onKeyDown={e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendMessage() } }}
               />
             </div>
             <div>
-              <button className="button" onClick={sendMessage} disabled={sending}>{sending ? '发送中…' : '发送'}</button>
+              <button className="button" onClick={sendMessage} disabled={sending}>{sending ? 'Sending…' : 'Send'}</button>
             </div>
           </div>
-          <div className="small" style={{marginTop:8}}>提示：请避免在对话中包含个人隐私、密钥等敏感信息。</div>
         </div>
       </div>
     </div>

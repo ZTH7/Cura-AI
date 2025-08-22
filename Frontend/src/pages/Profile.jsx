@@ -20,29 +20,29 @@ export default function Profile(){
         <div className="brand">
           <div className="brand-badge" />
           <div>
-            <div className="title">我的资料与勋章</div>
-            <div className="small">连接你的故事与每一枚徽章</div>
+            <div className="title">My Profile and Badges</div>
+            <div className="small">Connect your story with every badge</div>
           </div>
         </div>
-        <button className="button" onClick={() => window.location.href = '/'}>返回首页</button>
+        <button className="button" onClick={() => window.location.href = '/'}>Home</button>
       </header>
 
       <div className="row" style={{marginTop:16}}>
         <div className="card" style={{flex:'1 1 320px'}}>
-          <h3>我的信息</h3>
+          <h3>My Info</h3>
           {user ? (
             <div>
               <div style={{display:'flex', alignItems:'center', gap:12}}>
                 <div className="avatar" />
                 <div>
                   <div style={{fontWeight:700, fontSize:16}}>{user.nickname}</div>
-                  <div className="small">性别：{user.gender || '未填写'} · 年龄：{user.age ?? '未填写'}</div>
+                  <div className="small">Gender: {user.gender || 'Not filled'} · Age: {user.age ?? 'Not filled'}</div>
                 </div>
               </div>
-              <div className="small" style={{marginTop:8}}>钱包：{account ? `${account.slice(0,6)}…${account.slice(-4)}` : '未连接'}</div>
+              <div className="small" style={{marginTop:8}}>Wallet: {account ? `${account.slice(0,6)}…${account.slice(-4)}` : 'Not connected'}</div>
             </div>
           ) : (
-            <div className="notice">未找到你的资料。请返回首页连接钱包并完善信息。</div>
+            <div className="notice">Profile not found. Please go back to the home page to complete your profile, which will help me better accompany you.</div>
           )}
         </div>
 

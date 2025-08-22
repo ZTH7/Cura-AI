@@ -2,14 +2,14 @@ import React, { useState } from 'react'
 
 export default function OnboardingForm({ onSubmit }){
   const [nickname, setNickname] = useState('')
-  const [gender, setGender] = useState('未选择')
+  const [gender, setGender] = useState('Not selected')
   const [age, setAge] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     if(!nickname || !age){
-      alert('请填写昵称与年龄')
+      alert('Please fill in nickname and age')
       return
     }
     setSubmitting(true)
@@ -22,27 +22,27 @@ export default function OnboardingForm({ onSubmit }){
 
   return (
     <form className="stack" onSubmit={handleSubmit}>
-      <h3>完善你的资料</h3>
+      <h3>Complete your profile</h3>
       <div>
-        <div className="label">昵称</div>
-        <input className="input" placeholder="如：小暖" value={nickname} onChange={e=>setNickname(e.target.value)} />
+        <div className="label">Nickname</div>
+        <input className="input" placeholder="e.g. Eva" value={nickname} onChange={e=>setNickname(e.target.value)} />
       </div>
       <div>
-        <div className="label">性别</div>
+        <div className="label">Gender</div>
         <select className="select" value={gender} onChange={e=>setGender(e.target.value)}>
-          <option value="未选择">未选择</option>
-          <option value="女">女</option>
-          <option value="男">男</option>
-          <option value="其他">其他</option>
-          <option value="不透露">不透露</option>
+          <option value="Not selected">Not selected</option>
+          <option value="Female">Female</option>
+          <option value="Male">Male</option>
+          <option value="Other">Other</option>
+          <option value="Prefer not to say">Prefer not to say</option>
         </select>
       </div>
       <div>
-        <div className="label">年龄</div>
-        <input className="input" type="number" min="1" max="120" placeholder="你的年龄" value={age} onChange={e=>setAge(e.target.value)} />
+        <div className="label">Age</div>
+        <input className="input" type="number" min="1" max="120" placeholder="e.g. 20" value={age} onChange={e=>setAge(e.target.value)} />
       </div>
       <button className="button" type="submit" disabled={submitting}>
-        {submitting ? '创建中…' : '创建我的资料'}
+        {submitting ? 'Creating...' : 'Create my profile'}
       </button>
     </form>
   )

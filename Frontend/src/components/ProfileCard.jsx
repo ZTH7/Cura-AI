@@ -6,7 +6,7 @@ export default function ProfileCard({ user }){
       <div className="avatar" />
       <div>
         <div style={{fontWeight:700, fontSize:16}}>{user.nickname}</div>
-        <div className="small">性别：{user.gender || '未填写'} · 年龄：{user.age || '未填写'}</div>
+        <div className="small">Gender: {user.gender || 'Not selected'} · Age: {user.age || 'Not selected'}</div>
       </div>
     </div>
   )
