@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { BrowserProvider, Contract } from 'ethers'
+import { useAccount, useSignMessage, useWriteContract } from 'wagmi'
 import { IPFS_API_URL, IPFS_HEADERS } from '../config/ipfs'
 import { SYNC_CONTRACT_ADDRESS, SYNC_ABI } from '../config/sync'
 
@@ -14,7 +14,9 @@ function getLocalUser(addr){
 
 export default function Chat(){
   const apiKey = ''
-  const [account] = useState(getLastAccount())
+  const { address: account } = useAccount()
+  const { signMessageAsync } = useSignMessage()
+  const { writeContractAsync } = useWriteContract()
   const userProfile = useMemo(() => getLocalUser(account), [account])
   const storageKey = useMemo(() => (account ? `chat:${account.toLowerCase()}` : 'chat:guest'), [account])
   const [messages, setMessages] = useState(() => {
@@ -54,13 +56,10 @@ export default function Chat(){
 
   // ========== 加密与 IPFS 备份相关工具 ==========
   async function deriveAesKeyWithSigner(){
-    if(!window.ethereum) throw new Error('未检测到钱包')
-    const provider = new BrowserProvider(window.ethereum)
-    await window.ethereum.request({ method: 'eth_requestAccounts' })
-    const signer = await provider.getSigner()
-    const addr = (await signer.getAddress()).toLowerCase()
+    if(!account) throw new Error('未连接钱包')
+    const addr = account.toLowerCase()
     const domainMsg = `Psych DApp chat backup v1\n${addr}`
-    const sig = await signer.signMessage(domainMsg)
+    const sig = await signMessageAsync({ message: domainMsg })
     // 以签名文本做 SHA-256，导出 32 字节对称密钥
     const enc = new TextEncoder()
     const digest = await crypto.subtle.digest('SHA-256', enc.encode(sig))
@@ -108,17 +107,17 @@ export default function Chat(){
   }
 
   async function saveCidToContract(cid){
-    if(!window.ethereum) throw new Error('未检测到钱包')
+    if(!account) throw new Error('未连接钱包')
     if(!SYNC_CONTRACT_ADDRESS || SYNC_CONTRACT_ADDRESS === '0x0000000000000000000000000000000000000000'){
       throw new Error('未配置同步合约地址')
     }
-    const provider = new BrowserProvider(window.ethereum)
-    await window.ethereum.request({ method: 'eth_requestAccounts' })
-    const signer = await provider.getSigner()
-    const contract = new Contract(SYNC_CONTRACT_ADDRESS, SYNC_ABI, signer)
-    const tx = await contract.saveChatCID(cid)
-    await tx.wait()
-    return tx.hash
+    const hash = await writeContractAsync({
+      address: SYNC_CONTRACT_ADDRESS,
+      abi: SYNC_ABI,
+      functionName: 'saveChatCID',
+      args: [cid],
+    })
+    return hash
   }
 
   // 入口函数：加密 -> IPFS -> 上链同步 CID
