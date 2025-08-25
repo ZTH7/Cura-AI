@@ -16,7 +16,23 @@ export default function Home(){
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [checkingIn, setCheckingIn] = useState(false)
+  const [showTooltip, setShowTooltip] = useState(false)
   const navigate = useNavigate()
+  
+  // Close tooltip when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showTooltip && !event.target.closest('.tooltip-container')) {
+        setShowTooltip(false)
+      }
+    }
+    
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showTooltip])
   
   // 使用 wagmi 的 address 作为 account
   const account = address
@@ -49,7 +65,12 @@ export default function Home(){
     setError('')
     try{
       const u = await userClient.getUser(addr)
-      setUser(u)
+      // Add check-in status to user data
+      const userWithCheckInStatus = {
+        ...u,
+        hasCheckedInToday: checkIfSignedInToday(u)
+      }
+      setUser(userWithCheckInStatus)
     }catch(e){
       setUser(null)
     }finally{
@@ -70,6 +91,33 @@ export default function Home(){
     }finally{
       setLoading(false)
     }
+  }
+
+  const handleCheckIn = async () => {
+    if (!userClient || !account) return
+    
+    setCheckingIn(true)
+    setError('')
+    try {
+      const updatedUser = await userClient.checkIn()
+      setUser(prev => ({
+        ...prev,
+        ...updatedUser,
+        hasCheckedInToday: true
+      }))
+    } catch (e) {
+      console.error('Check-in failed:', e)
+      setError(e?.shortMessage || e?.message || 'Check-in failed')
+    } finally {
+      setCheckingIn(false)
+    }
+  }
+
+  // Check if user has already signed in today
+  const checkIfSignedInToday = (userData) => {
+    if (!userData?.lastDayIndex) return false
+    const currentDayIndex = Math.floor(Date.now() / (24 * 60 * 60 * 1000))
+    return userData.lastDayIndex === currentDayIndex
   }
 
   return (
@@ -113,8 +161,64 @@ export default function Home(){
 
           {account && !loading && user && (
             <>
-              <ProfileCard user={user} />
-              <div style={{marginTop:16, display:'flex', gap:12, flexWrap:'wrap'}}>
+              <div style={{display:'flex', alignItems:'center', gap:12, marginBottom:16}}>
+                <div style={{flex:1}}>
+                  <ProfileCard user={user} />
+                </div>
+                <div className="tooltip-container" style={{display:'flex', alignItems:'center', gap:8, position:'relative'}}>
+                  <button
+                    onClick={() => setShowTooltip(!showTooltip)}
+                    style={{
+                      width:'24px',
+                      height:'24px',
+                      borderRadius:'50%',
+                      border:'1px solid var(--accent)',
+                      background:'white',
+                      color:'var(--accent)',
+                      fontSize:'12px',
+                      fontWeight:'bold',
+                      cursor:'pointer',
+                      display:'flex',
+                      alignItems:'center',
+                      justifyContent:'center'
+                    }}
+                  >
+                    ?
+                  </button>
+                  {showTooltip && (
+                    <div style={{
+                      position:'absolute',
+                      top:'-80px',
+                      right:'0',
+                      background:'white',
+                      border:'1px solid #ffe5dc',
+                      borderRadius:'12px',
+                      padding:'12px',
+                      boxShadow:'var(--shadow)',
+                      fontSize:'12px',
+                      width:'200px',
+                      zIndex:1000
+                    }}>
+                      <div style={{fontWeight:'bold', marginBottom:'4px'}}>Check-in Rewards:</div>
+                      <div>• 7 days → Regular NFT</div>
+                      <div>• 30 days → Golden NFT</div>
+                    </div>
+                  )}
+                  <button 
+                    className="button" 
+                    onClick={handleCheckIn}
+                    disabled={checkingIn || user.hasCheckedInToday}
+                    style={{
+                      minWidth:'80px',
+                      background: user.hasCheckedInToday ? '#ffdcd4' : 'var(--accent)',
+                      color: user.hasCheckedInToday ? '#3b1f1a' : '#3b1f1a'
+                    }}
+                  >
+                    {checkingIn ? 'Signing...' : user.hasCheckedInToday ? 'Signed' : 'Sign'}
+                  </button>
+                </div>
+              </div>
+              <div style={{display:'flex', gap:12, flexWrap:'wrap'}}>
                 <button className="button" style={{flex:'1', textAlign:'center'}} onClick={()=>navigate('/chat')}>Start Talking</button>
                 <button className="button" style={{flex:'1', textAlign:'center'}} onClick={()=>navigate('/profile')}>View Badges</button>
               </div>

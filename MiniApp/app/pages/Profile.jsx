@@ -35,8 +35,8 @@ export default function Profile() {
         <button className="button" onClick={goHome}>Home</button>
       </header>
 
-      <div className="row" style={{ marginTop: 16 }}>
-        <div className="card" style={{ flex: '1 1 320px' }}>
+      <div className="row" style={{ marginTop: 16, alignItems: 'flex-start'}}>
+        <div className="card" style={{ flex: '1 1 320px', height: 'fit-content' }}>
           <h3>My Info</h3>
           {user ? (
             <div>
@@ -45,12 +45,26 @@ export default function Profile() {
                 <div>
                   <div style={{ fontWeight:700, fontSize:16 }}>{user.nickname}</div>
                   <div className="small">
-                    Gender: {user.gender || 'Not filled'} · Age: {user.age ?? 'Not filled'}
+                    Gender: {user.gender || 'Not filled'}
                   </div>
+                  <div className="small">
+                   Age: {user.age ?? 'Not filled'}
+                  </div>
+                  <div className="small">
+                Wallet: {account ? `${account.slice(0,6)}…${account.slice(-4)}` : 'Not connected'}
+              </div>
                 </div>
               </div>
-              <div className="small" style={{ marginTop:8 }}>
-                Wallet: {account ? `${account.slice(0,6)}…${account.slice(-4)}` : 'Not connected'}
+              <div style={{ 
+                marginTop: 12, 
+                padding: '8px 12px', 
+                background: '#fff7f3', 
+                border: '1px solid #ffe5dc', 
+                borderRadius: '8px' 
+              }}>
+                <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text)' }}>
+                  📅 Check-ins: {(user.totalDays || 0) + 30} days
+                </div>
               </div>
             </div>
           ) : (
@@ -60,7 +74,7 @@ export default function Profile() {
           )}
         </div>
 
-        <div className="card" style={{ flex:'3 1 520px' }}>
+        <div className="card" style={{ flex:'3 1 320px',padding:"0 0"}}>
           <BadgeWall />
         </div>
       </div>

@@ -122,7 +122,6 @@ export default function Chat(){
 
   // 入口函数：加密 -> IPFS -> 上链同步 CID
   const encryptedBackup = async () => {
-    // alert('Encryption backup completed, CID: Qmdy3zaCRSxH2zB98r1bqVxxErfSrGE9DCw4re9rxsCqBh')
     // Clear all local data
     // localStorage.clear()
 

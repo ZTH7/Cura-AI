@@ -2,15 +2,14 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { BrowserProvider, Contract } from "ethers";
 import { CONTRACT_ADDRESS, ABI, NFT_ABI } from "../config/contract";
-
 const moods = [
-  { day: "Mon.", mood: "😊" },
-  { day: "Tue.", mood: "😐" },
-  { day: "Wed.", mood: "😢" },
-  { day: "Thur.", mood: "😄" },
-  { day: "Fri.", mood: "❓" },
-  { day: "Sat.", mood: "❓" },
-  { day: "Sun.", mood: "❓" },
+  {index: 0, day: "Mon.", mood: "😊" },
+  {index: 1, day: "Tue.", mood: "❓" },
+  {index: 2, day: "Wed.", mood: "❓" },
+  {index: 3, day: "Thur.", mood:  "❓"},
+  {index: 4, day: "Fri.", mood: "❓" },
+  {index: 5, day: "Sat.", mood: "❓" },
+  {index: 6, day: "Sun.", mood: "❓" },
 ];
 
 function ipfsToHttp(url) {
@@ -26,6 +25,8 @@ export default function BadgeWall() {
   const [account, setAccount] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [selectedMoods, setSelectedMoods] = useState({});
+  const [showMoodSelector, setShowMoodSelector] = useState(null);
   const [badges, setBadges] = useState([
   { id: 1, name: "First login", icon: "🏅", earned: true },
   { id: 2, name: "Assessment completed", icon: "🧠", earned: true },
@@ -119,7 +120,7 @@ export default function BadgeWall() {
   return (
     <div>
       <div style={{ marginBottom: 24 }}>
-        <h3>My Badge Wall</h3>
+        <h3 style={{ padding:"0 1rem"}}>My Badge Wall</h3>
         {loading && <p>Reading your NFT badges…</p>}
         {error && (
           <div className="notice" style={{ marginBottom: 12 }}>
@@ -138,6 +139,8 @@ export default function BadgeWall() {
             gridTemplateColumns: "repeat(3, 1fr)",
             gap: 16,
             marginTop: 12,
+            justifyItems: "center",
+            padding: "0 20px",
           }}
         >
           {badges.map((b) => (
@@ -186,31 +189,87 @@ export default function BadgeWall() {
       </div>
 
       <div>
-        <h3>My Mood Record</h3>
+        <h3 style={{ padding:"0 1rem"}}>My Mood Record</h3>
         <div
           style={{
             display: "flex",
             gap: 16,
             flexWrap: "wrap",
             marginTop: 12,
+            justifyItems: "center",
+            padding: "0 20px",
           }}
         >
           {moods.map((item, index) => (
-            <div
-              key={index}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                background: "#fff",
-                padding: "1rem",
-                borderRadius: "1rem",
-                boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-                width: "70px",
-              }}
-            >
-              <span style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>{item.mood}</span>
-              <span style={{ fontSize: "0.9rem", color: "#555" }}>{item.day}</span>
+            <div key={index} style={{ position: 'relative' }}>
+              <div
+                onClick={() => {
+                  if (item.mood === "❓" && index <= 1) {
+                    setShowMoodSelector(showMoodSelector === index ? null : index);
+                  }
+                }}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  background: index > 1 ? "#f5f5f5" : "#fff",
+                  padding: "1rem",
+                  borderRadius: "1rem",
+                  boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+                  width: "70px",
+                  cursor: (item.mood === "❓" && index <= 1) ? "pointer" : "not-allowed",
+                  border: showMoodSelector === index ? "2px solid var(--accent)" : "none",
+                  opacity: index > 1 ? 0.6 : 1
+                }}
+              >
+                <span style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>
+                  {selectedMoods[index] || item.mood}
+                </span>
+                <span style={{ fontSize: "0.9rem", color: "#555" }}>{item.day}</span>
+              </div>
+              
+              {showMoodSelector === index && (
+                <div style={{
+                  position: 'absolute',
+                  top: '80px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  background: 'white',
+                  border: '2px solid #ffe5dc',
+                  borderRadius: '12px',
+                  padding: '8px',
+                  boxShadow: 'var(--shadow)',
+                  zIndex: 1000,
+                  display: 'flex',
+                  gap: '8px'
+                }}>
+                  {['😊', '😐', '😢', "😡","🥰"].map((emoji, emojiIndex) => (
+                    <button
+                      key={emojiIndex}
+                      onClick={() => {
+                        setSelectedMoods(prev => ({
+                          ...prev,
+                          [index]: emoji
+                        }));
+                        setShowMoodSelector(null);
+                      }}
+                      style={{
+                        background: 'none',
+                        border: '1px solid #ddd',
+                        fontSize: '1.5rem',
+                        cursor: 'pointer',
+                        padding: '4px 8px',
+                        borderRadius: '8px',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
+                      onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>
